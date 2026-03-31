@@ -1,24 +1,22 @@
-# 🌍 Global Food Watch: AI Early Warning System
+# Food Price Shock Detection System
 
-## 🚀 Project Overview
-This project implements a **Hybrid Early Warning System** designed to predict food price shocks and potential famine risks across global markets. It transitions from a baseline Logistic Regression to a sophisticated **XGBoost-based Watchdog** model, calibrated using **Quantile Regression**.
+## Project Overview
+An econometric pipeline designed to identify and categorize food price anomalies using a hybrid classification-regression approach. The goal is to detect persistent shocks (Z-score >= 2.0 for 3+ months) in international agricultural markets.
 
-## 🛠️ Technical Stack & Methods
-* **Machine Learning**: XGBoost, Quantile Regression (Pinball Loss), Logistic Regression.
-* **Optimization**: Hyperparameter tuning via **Optuna** (TPESampler & HyperbandPruner).
+## Data & Features
+* **Source**: UN World Food Programme (WFP) historical price data.
+* **Normalization**: Automated unit conversion (to KG/L) and currency indexing by country-product-year.
 * **Feature Engineering**: 
-    * Temporal dynamics: Rolling Z-scores (12/24m), Volatility (3/12m), Price Velocity, and Acceleration.
-    * Memory: Automated generation of T-1 to T-3 lags for 15+ features.
-    * Spatial: Market clustering (K-Means) to identify historical risk profiles.
-* **Explainability**: SHAP (TreeExplainer) for local and global model transparency.
-* **Deployment**: Interactive **Streamlit Dashboard** with real-time crisis simulation.
+    * Lagged variables (T-1 to T-3) for all price dynamics.
+    * Statistical moments: Rolling Z-scores (12m), volatility (3m/12m), price acceleration.
+    * Structural: Market clustering via K-Means to account for local risk profiles.
 
-## 📈 Key Innovation: The V8 Hybrid Logic
-The system doesn't just predict "Crisis/No Crisis". It uses a dual-scale calibration:
-1.  **Relative Scale**: Position of the current shock compared to its own training history (ECDF).
-2.  **Absolute Scale**: Comparison with global historical severity.
-3.  **Result**: A 5-level alert system (from *Normal* to *Force Majeure*) that handles extreme market "tipping points".
+## Model Architecture
+* **Classifier**: XGBoost optimized for F2-Score (to prioritize recall on crisis events).
+* **Severity Estimator**: Quantile Regression (XGBoost `reg:quantileerror`) at q95 to estimate "Worst Case" future scenarios.
+* **Inference**: A 5-level alert logic based on the convergence between probability of shock and predicted quantile severity.
 
-## 📊 Results Summary
-* **Detection Rate (Recall)**: Optimized for F2-Score to minimize false negatives (missed crises).
-* **Interpretability**: Top drivers identified include price acceleration and volatility ratios, validated by SHAP dependence plots.
+## Key Technical Tools
+* **Tuning**: Optuna (Hyperband Pruning).
+* **Interpretability**: SHAP Values (Global/Local importance).
+* **Interface**: Streamlit dashboard for historical backtesting and scenario simulation.
